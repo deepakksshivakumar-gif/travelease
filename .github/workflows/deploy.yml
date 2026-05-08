@@ -62,8 +62,16 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
 
           script: |
-            sudo /usr/local/bin/k3s kubectl set image deployment/auth-service auth-service=336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/auth-service:${IMAGE_TAG} -n travelease
+            IMAGE_TAG=${{ github.sha }}
 
-            sudo /usr/local/bin/k3s kubectl set image deployment/flight-service flight-service=336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/flight-service:${IMAGE_TAG} -n travelease
+            sudo /usr/local/bin/k3s kubectl set image deployment/auth-service \
+            auth-service=336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/auth-service:$IMAGE_TAG \
+            -n travelease
 
-            sudo /usr/local/bin/k3s kubectl set image deployment/hotel-service hotel-service=336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/hotel-service:${IMAGE_TAG} -n travelease
+            sudo /usr/local/bin/k3s kubectl set image deployment/flight-service \
+            flight-service=336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/flight-service:$IMAGE_TAG \
+            -n travelease
+
+            sudo /usr/local/bin/k3s kubectl set image deployment/hotel-service \
+            hotel-service=336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/hotel-service:$IMAGE_TAG \
+            -n travelease
