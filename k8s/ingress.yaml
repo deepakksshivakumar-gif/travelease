@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: travelease-ingress
+  namespace: travelease
+
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - http:
+        paths:
+
+          - path: /auth(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 80
+
+          - path: /flights(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flight-service
+                port:
+                  number: 80
+
+          - path: /hotels(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: hotel-service
+                port:
+                  number: 80

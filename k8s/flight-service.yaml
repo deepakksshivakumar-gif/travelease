@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: flight-service
+  namespace: travelease
+
+spec:
+  selector:
+    app: flight-service
+
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3002
+
+  type: ClusterIP

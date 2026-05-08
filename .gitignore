@@ -1,0 +1,14 @@
+node_modules/\n.env\n*.log\ndist/
+
+# AWS credentials and secrets - NEVER commit these
+infrastructure/aws-resources.env
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+# Terraform state (Stage 8)
+*.tfstate
+*.tfstate.backup
+.terraform/

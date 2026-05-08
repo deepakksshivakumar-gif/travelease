@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: auth-config
+  namespace: travelease
+
+data:
+  NODE_ENV: "production"
+  PORT: "3001"
+  SERVICE_NAME: "auth-service"

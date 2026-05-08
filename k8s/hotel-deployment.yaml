@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: hotel-service
+  namespace: travelease
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: hotel-service
+
+  template:
+    metadata:
+      labels:
+        app: hotel-service
+
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
+
+      containers:
+        - name: hotel-service
+
+          image: 336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/hotel-service:latest
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 3003
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3003
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3003
+            initialDelaySeconds: 10
+            periodSeconds: 5

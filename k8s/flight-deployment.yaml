@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: flight-service
+  namespace: travelease
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: flight-service
+
+  template:
+    metadata:
+      labels:
+        app: flight-service
+
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
+
+      containers:
+        - name: flight-service
+
+          image: 336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/flight-service:latest
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 3002
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 5
