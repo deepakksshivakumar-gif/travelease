@@ -1,0 +1,64 @@
+name: TravelEase CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push auth-service
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t 336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/auth-service:latest \
+            --push \
+            ./services/auth-service
+
+      - name: Build and push flight-service
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t 336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/flight-service:latest \
+            --push \
+            ./services/flight-service
+
+      - name: Build and push hotel-service
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t 336359748141.dkr.ecr.us-east-1.amazonaws.com/travelease/hotel-service:latest \
+            --push \
+            ./services/hotel-service
+
+      - name: Deploy to k3s
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            sudo /usr/local/bin/k3s kubectl rollout restart deployment auth-service -n travelease
+            sudo /usr/local/bin/k3s kubectl rollout restart deployment flight-service -n travelease
+            sudo /usr/local/bin/k3s kubectl rollout restart deployment hotel-service -n travelease
